@@ -7,7 +7,6 @@
       <span> <span class="complete-box"></span> = Complete </span>
     </div>
     <div class="todos">
-      y
       <div
         v-for="todo in allTodos"
         :key="todo.id"
@@ -41,7 +40,7 @@
     name: 'Todos',
     data() {
       return {
-        editId: 4,
+        editId: 0,
       }
     },
     methods: {
