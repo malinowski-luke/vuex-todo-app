@@ -7,15 +7,29 @@
       <span> <span class="complete-box"></span> = Complete </span>
     </div>
     <div class="todos">
+      y
       <div
-        @dblclick="onDoubleClick(todo)"
         v-for="todo in allTodos"
         :key="todo.id"
+        @dblclick="onDoubleClick(todo)"
         class="todo"
         v-bind:class="{ 'is-complete': todo.completed }"
       >
-        {{ todo.title }}
-        <i @click="deleteTodo(todo.id)" class="fas fa-trash-alt"></i>
+        <div v-if="editId === +todo.id">
+          <form @submit="updateTodoTitle($event, todo)">
+            <input type="text" v-bind:value="todo.title" />
+            <input type="submit" value="Save" />
+          </form>
+          <i @click="toggleEdit()" class="fas fa-window-close icon-right"></i>
+        </div>
+        <span v-else
+          >{{ todo.title }}
+          <i
+            @click="deleteTodo(todo.id)"
+            class="fas fa-trash-alt icon-right"
+          ></i>
+          <i @click="toggleEdit(todo.id)" class="fas fa-edit icon-left"></i>
+        </span>
       </div>
     </div>
   </div>
@@ -25,11 +39,29 @@
   import { mapGetters, mapActions } from 'vuex'
   export default {
     name: 'Todos',
+    data() {
+      return {
+        editId: 4,
+      }
+    },
     methods: {
       ...mapActions(['fetchTodos', 'deleteTodo', 'updateTodo']),
       onDoubleClick(todo) {
         const updatedTodo = { ...todo, completed: !todo.completed }
         this.updateTodo(updatedTodo)
+      },
+      updateTodoTitle(e, todo) {
+        e.preventDefault()
+        const newUserTitle = e.target[0].value
+        if (newUserTitle !== todo.title) {
+          const updatedTodo = { ...todo, title: e.target[0].value }
+          this.updateTodo(updatedTodo)
+        }
+        this.toggleEdit()
+      },
+      toggleEdit(todoID) {
+        if (!todoID) return (this.editId = 0)
+        this.editId = todoID
       },
     },
     computed: mapGetters(['allTodos']),
@@ -53,14 +85,20 @@
     text-align: center;
     position: relative;
     cursor: pointer;
-    margin: 10px;
+    padding: 20px;
+    margin: 5px;
   }
   i {
     position: absolute;
     bottom: 10px;
-    right: 10px;
     color: #fff;
     cursor: pointer;
+  }
+  .icon-left {
+    left: 10px;
+  }
+  .icon-right {
+    right: 10px;
   }
   .legend {
     display: flex;
